@@ -103,11 +103,11 @@
 <script>
 const LS_KEY='shop_pro_v2';
 let data = JSON.parse(localStorage.getItem(LS_KEY) || '{"sales":[],"expenses":[]}');
-if(data.sales.length===0 && data.expenses.length===0){
-  const today=new Date().toISOString().slice(0,10);
-  data={sales:[{id:1,date:today,category:'Chilled Drinks',name:'Coca-Cola 50cl',qty:10,cost:0.5,price:1.2,profit:7},{id:2,date:today,category:'Premium Body Oils',name:'Coconut Oil 100ml',qty:3,cost:3,price:6,profit:9}],expenses:[{id:1,date:today,category:'Transport',desc:'Delivery',amount:12}]};
-  localStorage.setItem(LS_KEY, JSON.stringify(data));
-}
+// if(data.sales.length===0 && data.expenses.length===0){
+//   const today=new Date().toISOString().slice(0,10);
+//   data={sales:[{id:1,date:today,category:'Chilled Drinks',name:'Coca-Cola 50cl',qty:10,cost:0.5,price:1.2,profit:7},{id:2,date:today,category:'Premium Body Oils',name:'Coconut Oil 100ml',qty:3,cost:3,price:6,profit:9}],expenses:[{id:1,date:today,category:'Transport',desc:'Delivery',amount:12}]};
+//   localStorage.setItem(LS_KEY, JSON.stringify(data));
+// }
 let charts={};
 function save(){localStorage.setItem(LS_KEY, JSON.stringify(data)); updateAll();}
 function doLogin(){const e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPass').value; if(e==='demo@shop.pro' && p==='demo123'){localStorage.setItem('shop_auth','1');document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');lucide.createIcons(); updateAll();} else document.getElementById('loginErr').classList.remove('hidden');}
