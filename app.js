@@ -19,7 +19,17 @@ function student(){
 async function getStudent() {
     try {
         const result = await student();
-        console.log(`${result.name} scored ${result.score}`)
+        //convert student data to json
+        const studentJson = JSON.stringify(result);
+       // save to localstorage
+       const saved = localStorage.setItem("student",studentJson)
+         // retrieve student record
+        const savedStudents = localStorage.getItem("student");
+        //convert json to object
+        const parsedStudent = JSON.parse(savedStudents);
+        
+        
+        console.log(`${parsedStudent.name} scored ${parsedStudent.score}`)
     } catch (error) {
         console.log(error)
     }
@@ -35,10 +45,10 @@ async function getUsers() {
         if(!response.ok) throw new Error(`HTTP Error:${response.status}`)
         const users = await response.json();
          let userNames= users.map(user=>{
-            return{
-            name:user.name,
-            email:user.email
-            }
+          return{
+            user:user.name,
+            email:email.email
+          }
          })
          userNames.forEach(user => {
             console.log(`Name:${user.name},Email:${user.email}`)
