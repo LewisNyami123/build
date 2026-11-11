@@ -149,7 +149,63 @@ function renderTable(){
  lucide.createIcons();
 }
 function del(type,id){if(type==='sale') data.sales=data.sales.filter(s=>s.id!==id); else data.expenses=data.expenses.filter(e=>e.id!==id);save();showToast('Deleted');}
-function exportCSV(){let csv='Date,Type,Category,Name,Amount,Profit\n';data.sales.forEach(s=>{csv+=`${s.date},sale,${s.category},"${s.name}",${(s.price*s.qty).toFixed(2)},${s.profit.toFixed(2)}\n`;});data.expenses.forEach(e=>{csv+=`${e.date},expense,${e.category},"${e.desc}",${e.amount.toFixed(2)},-${e.amount.toFixed(2)}\n`;});const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='shop-ledger.csv';a.click();}
+// function exportCSV(){
+//   let csv='Date,Type,Category,Name,Amount,Profit\n';data.sales.forEach(s=>{csv+=`${s.date},sale,${s.category},"${s.name}",${(s.price*s.qty).toFixed(2)},${s.profit.toFixed(2)}\n`;});data.expenses.forEach(e=>{csv+=`${e.date},expense,${e.category},"${e.desc}",${e.amount.toFixed(2)},-${e.amount.toFixed(2)}\n`;});const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='shop-ledger.csv';a.click();
+// }
+let fileHandle = null;
+
+async function exportCSV() {
+  // 1. Build the CSV string
+  let csv = 'Date,Type,Category,Name,Amount,Profit\n';
+  data.sales.forEach(s => {
+    csv += `${s.date},sale,${s.category},"${s.name}",${(s.price * s.qty).toFixed(2)},${s.profit.toFixed(2)}\n`;
+  });
+  data.expenses.forEach(e => {
+    csv += `${e.date},expense,${e.category},"${e.desc}",${e.amount.toFixed(2)},-${e.amount.toFixed(2)}\n`;
+  });
+
+  // 2. Check if the browser supports the File System Access API
+  if ('showSaveFilePicker' in window) {
+    try {
+      // Ask the user to pick the file only if we haven't linked it yet
+      if (!fileHandle) {
+        fileHandle = await window.showSaveFilePicker({
+          suggestedName: 'shop-ledger.csv',
+          types: [{
+            description: 'CSV Ledger File',
+            accept: { 'text/csv': ['.csv'] },
+          }],
+        });
+      }
+
+      // 3. Overwrite the existing file with the updated data
+      const writable = await fileHandle.createWritable();
+      await writable.write(csv);
+      await writable.close();
+      
+      alert('Shop ledger updated successfully.');
+    } catch (err) {
+      // Handle user canceling the file picker or permission denial
+      if (err.name !== 'AbortError') {
+        console.error('Failed to save file:', err);
+      }
+    }
+  } else {
+    // Fallback for unsupported browsers (Firefox, Safari)
+    fallbackDownload(csv);
+  }
+}
+
+function fallbackDownload(csv) {
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'shop-ledger.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function updateAll(){updateKPI();buildCharts();renderTable;}
 window.addEventListener('online',()=>{document.getElementById('netText').textContent='Online';document.getElementById('netDot').className='inline-block w-2 h-2 rounded-full bg-emerald-500';});window.addEventListener('offline',()=>{document.getElementById('netText').textContent='Offline';document.getElementById('netDot').className='inline-block w-2 h-2 rounded-full bg-amber-500';});
 lucide.createIcons(); if(localStorage.getItem('shop_auth')) updateAll();
